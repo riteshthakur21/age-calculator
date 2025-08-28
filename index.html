@@ -1,0 +1,340 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Haunted Age Counter – How Long Until You're Dust?</title>
+    
+    <!-- SEO and Social Media Meta Tags -->
+    <meta name="description" content="A spooky, haunted age counter that tells you how many seconds you've been alive... and predicts your funny, fictional demise.">
+    <meta name="theme-color" content="#0d0d0d">
+    <meta property="og:title" content="Haunted Age Counter ☠️">
+    <meta property="og:description" content="Stare into the abyss and watch the seconds of your life tick away.">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://example.com"> <!-- Replace with actual URL when deployed -->
+    <meta property="og:image" content="https://placehold.co/1200x630/0d0d0d/ff0000?text=DOOM">
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- Google Fonts: Creepster for headings, VT323 for counter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=VT323&display=swap" rel="stylesheet">
+
+    <style>
+        body {
+            font-family: 'Helvetica Neue', sans-serif;
+            background-color: #0d0d0d;
+            background-image: linear-gradient(rgba(0,0,0,0.9), rgba(0,0,0,0.9)), url('https://www.transparenttextures.com/patterns/foggy-birds.png');
+        }
+        .font-creepy {
+            font-family: 'Creepster', cursive;
+        }
+        .font-terminal {
+            font-family: 'VT323', monospace;
+        }
+        
+        /* Flickering Animation */
+        @keyframes flicker {
+          0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+            opacity: 1;
+            text-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80, 0 0 30px #4ade80, 0 0 40px #16a34a;
+          }
+          20%, 22%, 24%, 55% {
+            opacity: 0.2;
+            text-shadow: none;
+          }
+        }
+        .flicker-text {
+            animation: flicker 2s infinite;
+        }
+
+        /* Blood Red Glow */
+        .glow-red {
+            text-shadow: 0 0 8px #ff0000, 0 0 12px #ff0000;
+        }
+        
+        /* Neon Green Glow */
+        .glow-green {
+             text-shadow: 0 0 10px #4ade80, 0 0 20px #4ade80;
+        }
+        
+        /* Button Hover Effect */
+        .btn-spooky {
+            transition: all 0.3s ease;
+            box-shadow: 0 0 8px #ff0000;
+        }
+        .btn-spooky:hover {
+            color: #0d0d0d !important;
+            background-color: #4ade80 !important;
+            box-shadow: 0 0 15px #4ade80, 0 0 25px #4ade80;
+        }
+
+        /* Style for date/time input icons in dark mode */
+        input[type="date"]::-webkit-calendar-picker-indicator,
+        input[type="time"]::-webkit-calendar-picker-indicator {
+            filter: invert(1) sepia(1) saturate(100) hue-rotate(0deg);
+        }
+    </style>
+</head>
+<body class="text-[#f5f5f5] flex flex-col items-center justify-center min-h-screen p-4">
+
+    <div class="w-full max-w-lg mx-auto">
+        <header class="text-center mb-6">
+            <h1 class="text-5xl md:text-7xl font-creepy text-red-300 glow-red tracking-widest">Tu toh gya beta ☠️</h1>
+        </header>
+
+        <main class="space-y-6">
+            <!-- Input Card -->
+            <div id="input-section" class="bg-[#1a1a1a] p-6 md:p-8 rounded-xl shadow-2xl transition-all duration-500 border-2 border-red-600 shadow-red-500/20">
+                <form id="dob-form" novalidate>
+                    <div class="space-y-4">
+                        <div>
+                            <label for="dob" class="block text-sm font-bold text-red-500 mb-1">Enter your Birth Date</label>
+                            <input type="date" id="dob" name="dob" required class="w-full p-3 bg-black text-green-400 border border-red-800 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition font-terminal text-lg">
+                        </div>
+                        <div>
+                            <label for="tob" class="block text-sm font-bold text-red-500 mb-1">Enter your Birth Time (Optional)</label>
+                            <input type="time" id="tob" name="tob" class="w-full p-3 bg-black text-green-400 border border-red-800 rounded-md focus:ring-2 focus:ring-red-500 focus:border-red-500 transition font-terminal text-lg">
+                        </div>
+                    </div>
+                    <p id="error-msg" class="text-red-400 text-sm mt-4 h-5 font-bold"></p>
+                    <button type="submit" id="start-btn" class="w-full bg-black text-white font-bold py-3 px-4 rounded-md border-2 border-red-600 focus:outline-none transition-transform transform hover:scale-105 mt-4 btn-spooky">
+                        Seal Your Fate
+                    </button>
+                </form>
+            </div>
+
+            <!-- Output Section (Initially Hidden) -->
+            <div id="output-section" class="hidden space-y-6">
+                <!-- Live Counter Card -->
+                <div class="bg-[#1a1a1a] p-6 md:p-8 rounded-xl shadow-2xl text-center fade-in border-2 border-green-500 shadow-green-500/20">
+                    <p class="text-sm text-neutral-400 mb-2">Tum Barbaad kar diye ho...</p>
+                    <div id="seconds-counter" class="text-5xl md:text-7xl font-terminal text-green-400 break-all glow-green flicker-text" aria-live="polite">
+                        ...
+                    </div>
+                    <p class="text-sm text-neutral-400 mt-2 mb-6">seconds, ab kuchh nhi hone wala !</p>
+                    
+                    <div class="flex flex-wrap justify-center gap-2 mb-6 font-terminal text-lg">
+                        <span id="years" class="bg-black text-green-400 px-3 py-1 rounded"></span>
+                        <span id="days" class="bg-black text-green-400 px-3 py-1 rounded"></span>
+                        <span id="hours" class="bg-black text-green-400 px-3 py-1 rounded"></span>
+                        <span id="minutes" class="bg-black text-green-400 px-3 py-1 rounded"></span>
+                        <span id="seconds" class="bg-black text-green-400 px-3 py-1 rounded"></span>
+                    </div>
+
+                    <div class="mt-6">
+                        <button id="edit-btn" class="w-full bg-black text-white font-bold py-3 px-4 rounded-md border-2 border-red-600 focus:outline-none transition-transform transform hover:scale-105 btn-spooky">Change Your Fate</button>
+                    </div>
+                </div>
+
+                <!-- Funny Death Predictor Card -->
+                <div id="death-date-card" class="bg-[#1a1a1a] p-6 rounded-xl shadow-2xl text-center fade-in border-2 border-red-600 shadow-red-500/20 space-y-3">
+                    <p id="death-date-prediction" class="text-xl font-bold text-red-500 glow-red"></p>
+                    <p id="death-age-prediction" class="text-xl font-bold text-red-500 glow-red"></p>
+                </div>
+            </div>
+        </main>
+
+        <footer class="text-center mt-8 text-neutral-500 text-sm space-y-2">
+            <p class="font-bold text-yellow-500">⚠️ This is just a fun game bro, don’t take it seriously 😅</p>
+            <p style="font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">Made by &hearts; Ritesh</p>
+        </footer>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM Elements
+            const inputSection = document.getElementById('input-section');
+            const outputSection = document.getElementById('output-section');
+            const dobForm = document.getElementById('dob-form');
+            const dobInput = document.getElementById('dob');
+            const tobInput = document.getElementById('tob');
+            const errorMsg = document.getElementById('error-msg');
+            
+            const secondsCounter = document.getElementById('seconds-counter');
+            const yearsEl = document.getElementById('years');
+            const daysEl = document.getElementById('days');
+            const hoursEl = document.getElementById('hours');
+            const minutesEl = document.getElementById('minutes');
+            const secondsEl = document.getElementById('seconds');
+            
+            const editBtn = document.getElementById('edit-btn');
+            const deathDateCard = document.getElementById('death-date-card');
+            const deathDatePrediction = document.getElementById('death-date-prediction');
+            const deathAgePrediction = document.getElementById('death-age-prediction');
+
+            // State variables
+            let birthDateTime = null;
+            let intervalId = null;
+
+            // --- Initialization ---
+            function initialize() {
+                const today = new Date();
+                const offset = today.getTimezoneOffset();
+                const todayLocal = new Date(today.getTime() - (offset*60*1000));
+                dobInput.max = todayLocal.toISOString().split("T")[0];
+                
+                loadStateFromURL() || loadStateFromLocalStorage();
+            }
+
+            // --- State Management ---
+            function loadStateFromURL() {
+                const params = new URLSearchParams(window.location.search);
+                const dob = params.get('dob');
+                const time = params.get('time');
+                if (dob) {
+                    dobInput.value = dob;
+                    tobInput.value = time || '';
+                    dobForm.requestSubmit();
+                    return true;
+                }
+                return false;
+            }
+
+            function loadStateFromLocalStorage() {
+                const dob = localStorage.getItem('userDOB');
+                const time = localStorage.getItem('userTOB');
+                if (dob) {
+                    dobInput.value = dob;
+                    tobInput.value = time || '';
+                    dobForm.requestSubmit();
+                }
+            }
+
+            function saveState(dob, time) {
+                const params = new URLSearchParams();
+                params.set('dob', dob);
+                if (time) {
+                    params.set('time', time);
+                }
+                const newUrl = `${window.location.pathname}?${params.toString()}`;
+                
+                try {
+                    window.history.replaceState({ path: newUrl }, '', newUrl);
+                } catch (e) {
+                    console.warn("Could not update URL: ", e);
+                }
+
+                localStorage.setItem('userDOB', dob);
+                localStorage.setItem('userTOB', time || '');
+            }
+
+            // --- Event Handlers ---
+            dobForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                errorMsg.textContent = '';
+
+                const dobValue = dobInput.value;
+                const tobValue = tobInput.value || '00:00:00';
+
+                if (!dobValue) {
+                    errorMsg.textContent = 'Enter your date of arrival, mortal.';
+                    return;
+                }
+
+                const dateTimeString = `${dobValue}T${tobValue}`;
+                const tentativeBirthDate = new Date(dateTimeString);
+
+                if (isNaN(tentativeBirthDate.getTime())) {
+                    errorMsg.textContent = 'This date is... unnatural.';
+                    return;
+                }
+
+                if (tentativeBirthDate > new Date()) {
+                    errorMsg.textContent = 'You are not yet born. Begone, spirit!';
+                    return;
+                }
+                
+                birthDateTime = tentativeBirthDate;
+                saveState(dobValue, tobInput.value);
+                
+                inputSection.classList.add('hidden');
+                outputSection.classList.remove('hidden');
+                
+                startCounter();
+                generateFunnyDeathDate(birthDateTime);
+            });
+
+            editBtn.addEventListener('click', () => {
+                clearInterval(intervalId);
+                intervalId = null;
+                birthDateTime = null;
+                outputSection.classList.add('hidden');
+                inputSection.classList.remove('hidden');
+            });
+
+            // --- Core Logic ---
+            function startCounter() {
+                if (intervalId) clearInterval(intervalId);
+                
+                updateDisplay();
+                intervalId = setInterval(updateDisplay, 1000);
+            }
+
+            function updateDisplay() {
+                if (!birthDateTime) return;
+
+                const now = new Date();
+                const elapsedMs = now.getTime() - birthDateTime.getTime();
+                
+                const totalSecondsLived = Math.floor(elapsedMs / 1000);
+                secondsCounter.textContent = totalSecondsLived.toLocaleString('en-US');
+
+                updateBreakdown(elapsedMs);
+            }
+
+            function updateBreakdown(elapsedMs) {
+                // Corrected breakdown logic
+                let totalSeconds = Math.floor(elapsedMs / 1000);
+
+                const years = Math.floor(totalSeconds / (365.25 * 24 * 60 * 60)); // Using 365.25 for better year accuracy
+                totalSeconds %= (365.25 * 24 * 60 * 60);
+
+                const days = Math.floor(totalSeconds / (24 * 60 * 60));
+                totalSeconds %= (24 * 60 * 60);
+
+                const hours = Math.floor(totalSeconds / (60 * 60));
+                totalSeconds %= (60 * 60);
+
+                const minutes = Math.floor(totalSeconds / 60);
+                const seconds = totalSeconds % 60;
+
+                yearsEl.textContent = `${years}y`;
+                daysEl.textContent = `${days}d`;
+                hoursEl.textContent = `${hours}h`;
+                minutesEl.textContent = `${minutes}m`;
+                secondsEl.textContent = `${seconds}s`;
+            }
+
+            function generateFunnyDeathDate(birthDate) {
+                const emojis = ["💀","⚰️","🪦","🤣","⏳","👻","🎉", "😂", "👁️"];
+                const randomEmoji1 = emojis[Math.floor(Math.random() * emojis.length)];
+                const randomEmoji2 = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                const deathAge = Math.floor(Math.random() * (120 - 30 + 1)) + 30;
+                
+                const deathDate = new Date(birthDate);
+                deathDate.setFullYear(deathDate.getFullYear() + deathAge);
+
+                const randomMonthOffset = Math.floor(Math.random() * 12) - 6;
+                const randomDayOffset = Math.floor(Math.random() * 30) - 15;
+                deathDate.setMonth(deathDate.getMonth() + randomMonthOffset);
+                deathDate.setDate(deathDate.getDate() + randomDayOffset);
+
+                const options = { year: 'numeric', month: 'long', day: 'numeric' };
+                const formattedDate = deathDate.toLocaleDateString('en-US', options);
+
+                deathDatePrediction.innerHTML = `Tum Isse Din Maroge: <span class="text-white font-terminal">${formattedDate}</span> ${randomEmoji1}`;
+                deathAgePrediction.innerHTML = `At the Age of this : <span class="text-white font-terminal">${deathAge}</span> ${randomEmoji2}`;
+                
+                deathDateCard.classList.remove('hidden');
+            }
+
+            // --- Start the app ---
+            initialize();
+        });
+    </script>
+</body>
+</html>
